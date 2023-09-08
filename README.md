@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://imgur.com/aZekRMC">
+    <img src="https://i.imgur.com/aZekRMC.png" alt="Image from Imgur">
+  </a>
+</p>
+
 # Strawdoll
 
 **Strawdoll** is an offline account recovery tool built with a focus on privacy and security. It's important to note that some features may be in a placeholder or proof-of-concept state and might not function as expected or be fully operational.
