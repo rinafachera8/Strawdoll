@@ -42,5 +42,11 @@
 
 ---
 
+## Full Disclaimer
+
+For a comprehensive understanding of the terms of use and the software's intended purpose, please refer to the [full disclaimer here](https://github.com/Hysocs/Strawdoll/blob/main/DISCLAIMER.md).
+
+---
+
 For feedback, contributions, or issues, please refer to the repository's issue tracker.
 
