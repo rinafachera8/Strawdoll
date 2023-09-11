@@ -215,3 +215,62 @@ class NoiseGenerator:
             except Exception as e:
                 logger.error(f"Error in activity simulation: {e}")
                 await asyncio.sleep(1)
+
+    @staticmethod
+    async def misleading_string_generator():
+        logger.info("Misleading string generation started...")
+
+        function_names = [
+            "fetchUserData", "deleteRecords", "updateConfiguration", 
+            "syncDatabase", "processQueue", "verifyUserCredentials",
+            "resetPassword", "updateUserSettings"
+        ]
+        error_messages = [
+            "Error: Connection Timeout", "Failed to update record", 
+            "Warning: Low Memory", "Critical: Data Integrity Issue",
+            "Password Mismatch", "Username Not Found", "Access Denied",
+            "Authentication Failed", "Check Failed"
+        ]
+        code_snippets = [
+            "if (user.isAuthenticated()) { ... }", 
+            "return fetch(API_ENDPOINT);", 
+            "try { ... } catch (e) { ... }",
+            "if (password === confirmPassword) { ... }",
+            "throw new Error('Invalid Credentials');"
+        ]
+        comments = [
+            "// TODO: Implement encryption here", 
+            "// FIXME: This function sometimes returns null", 
+            "// HACK: Temporary solution", 
+            "// Check user permissions before proceeding",
+            "// Validate user input"
+        ]
+        technical_jargon = [
+            "Distributed Machine Learning Pipeline", 
+            "Recursive Binary Search Tree", 
+            "Asynchronous Data Stream", 
+            "Quantum Encryption Protocol",
+            "Token-based Authentication Flow", "OAuth2.0 Authorization"
+        ]
+        auth_related = [
+            "Password: [REDACTED]", "Username: admin",
+            "Success: User authenticated", "Fail: Invalid credentials",
+            "Error: Passwords don't match", "Access Level: Administrator",
+            "User Role: Guest", "Session Expired: Please log in again"
+        ]
+
+        all_misleading_strings = function_names + error_messages + code_snippets + comments + technical_jargon + auth_related
+
+        while True:
+            try:
+                misleading_string = random.choice(all_misleading_strings)
+                logger.info(f"Generated misleading string: {misleading_string}")
+
+                # Variable sleep interval
+                sleep_time = random.uniform(0.05, 0.5)
+                await asyncio.sleep(sleep_time)
+
+            except Exception as e:
+                logger.error(f"Error in misleading string generation: {e}")
+                await asyncio.sleep(1)
+
