@@ -20,6 +20,8 @@ parts/
 sdist/
 StygainCore/
 StygianCore
+strawdoll_env/
+strawdoll_env
 var/
 wheels/
 share/python-wheels/
