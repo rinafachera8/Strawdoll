@@ -1,5 +1,6 @@
 import win32api
 import win32com.client
+import pythoncom
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 import ctypes
 import psutil
@@ -44,6 +45,7 @@ class SystemChecks:
 
     def check_gpu(self):
         try:
+            pythoncom.CoInitialize()
             wmi = win32com.client.Dispatch("WbemScripting.SWbemLocator")
             wm_instance = wmi.ConnectServer(".", "root\cimv2")
             gpus = wm_instance.ExecQuery("Select * from Win32_VideoController")

