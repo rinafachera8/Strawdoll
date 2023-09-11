@@ -1,3 +1,8 @@
+# Ignore Python virtual environment folders
+venv/
+env/
+*.pyc
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -164,3 +169,6 @@ cython_debug/
 #.idea/
 
 encrypted_webhook.txt
+encrypted_webhook
+requirements.txt
+requirements
