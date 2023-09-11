@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://imgur.com/aZekRMC">
+    <img src="https://i.imgur.com/aZekRMC.png" alt="Image from Imgur">
+  </a>
+</p>
+
 # Strawdoll
 
 **Strawdoll** is an offline account recovery tool built with a focus on privacy and security. It's important to note that some features may be in a placeholder or proof-of-concept state and might not function as expected or be fully operational.
@@ -10,9 +16,9 @@
 
 - **Roblox Token Recovery**:
 - **Discord Token Recovery**:
-- **Twitter Token Recovery**:
-- **Instagram Token Recovery**:
-- **Netflix Token Recovery**:
+- **Twitter Cookie Recovery**:
+- **Instagram Cookie Recovery**:
+- **Netflix Cookie Recovery**:
 - **Saved Browser Data Recovery**: Includes browser login data, credit cards, downloads, and history.
 
 
@@ -33,6 +39,12 @@
 **Modifications & Liability**: Unauthorized modifications to the original code are discouraged. The authors and contributors are not liable for any unauthorized modifications or consequences thereof.
 
 **Data Protection Assurance**: Strawdoll is dedicated to user data protection. It neither stores nor transmits any user data and operates offline to ensure user privacy.
+
+---
+
+## Full Disclaimer
+
+For a comprehensive understanding of the terms of use and the software's intended purpose, please refer to the [full disclaimer here](https://github.com/Hysocs/Strawdoll/blob/main/DISCLAIMER.md).
 
 ---
 
