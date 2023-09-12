@@ -27,6 +27,8 @@ StygainCore/
 StygianCore
 strawdoll_env/
 strawdoll_env
+strawdollvenv
+strawdollvenv/
 var/
 wheels/
 share/python-wheels/

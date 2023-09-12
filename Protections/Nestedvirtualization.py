@@ -22,7 +22,6 @@ class NestedVirtualizationChecker:
         self.hyper_v_processes = [
             "vmms.exe",             # Hyper-V Virtual Machine Management Service
             "vmwp.exe",             # Hyper-V Worker Process (one for each VM)
-            "vmcompute.exe",        # Hyper-V Host Compute Service (related to containers & Hyper-V)
             "vmbus.sys",            # Hyper-V VMBus
             "vmicrdv.sys",          # Hyper-V Integration Device Redirector
             "vmicvss.sys",          # Hyper-V Volume Shadow Copy Requestor
