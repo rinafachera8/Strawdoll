@@ -24,7 +24,7 @@
 
 ### 🛠 Advanced Features
 
-- **UAC Bypass**: Aims to bypass User Account Control. (Note: This feature is somewhat operational and may not work consistently.)
+- **UAC Bypass**: Aims to bypass User Account Control. (Note: This is currently patched, working on new method)
 - **Anti-Debugger**: Ensures that the tool cannot be easily debugged or reverse-engineered.
 - **Forbidden Process Blocker**: Proactively blocks processes that may compromise security.
 - **Noise Generation**: Generates noise to deter and confuse potential threats.
