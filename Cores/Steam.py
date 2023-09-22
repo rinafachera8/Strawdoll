@@ -4,6 +4,9 @@ import json
 import logging
 from Utilities.DataSaver import DataSaverUtility
 
+from Utilities.StealthReader import StealthyFileReader
+
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -30,8 +33,10 @@ class SteamLoginRecovery:
             logging.warning(f"{login_file} does not exist.")
             return None
         
-        with open(login_file, "r", encoding="utf8") as f:
-            content = f.read()
+
+        reader = StealthyFileReader(login_file)
+        content = reader.read_text()
+        print(f"Reading {login_file} using: {reader.method_used}")
 
         return self._parse_vdf_content(content)
 
