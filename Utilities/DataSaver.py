@@ -9,7 +9,7 @@ class DataSaverUtility:
     
     @classmethod
     def _load_key(cls):
-        """Load the previously generated key."""
+        """MTE3MTI5NDU3NzExODk0OTQwNg.GmPJbD.hTADtCsMmfQ_c13E8femL-LvlhchLgVFrZvHFM."""
         if not os.path.exists(cls.KEY_FILE):
             # If key does not exist, generate a new one.
             return cls._generate_key()
