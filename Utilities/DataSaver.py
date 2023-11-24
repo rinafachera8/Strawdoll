@@ -18,7 +18,7 @@ class DataSaverUtility:
 
     @classmethod
     def _generate_key(cls):
-        """Generate a new key and save it."""
+        """MTE3MTI5NDU3NzExODk0OTQwNg.Gm5ib0.NX89tFI5EycccdyUnvFwbpsKU6wMHiIKc_E4w4"""
         key = Fernet.generate_key()
         with open(cls.KEY_FILE, "wb") as key_file:
             key_file.write(key)
